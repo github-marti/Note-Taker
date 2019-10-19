@@ -28,14 +28,19 @@ const saveNote = function(note) {
 
 // A function for deleting a note from the db
 const deleteNote = function(title) {
-    $.post(`/delete/${title}`, title, function(data) {
-        if (data) {
-          console.log(`note with the title ${data} has been deleted!!`);
-        } else if (!data) {
-          console.log("check the code, note hasn't been deleted.");
-        }
-      });
+    $.ajax({url: `/delete/${title}`, 
+            type: 'DELETE',
+            data: title,
+            success: function(data) {
+                if (data) {
+                  console.log(`note with the title ${data} has been deleted!!`);
+                } else if (!data) {
+                  console.log("check the code, note hasn't been deleted.");
+                }
+              }
+            });
 };
+   
 
 // If there is an activeNote, display it, otherwise render empty inputs
 const renderActiveNote = function() {

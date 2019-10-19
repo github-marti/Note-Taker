@@ -39,7 +39,7 @@ module.exports = function(app) {
         };
     });
 
-    app.post("/delete/:title", function(req, res) {
+    app.delete("/delete/:title", function(req, res) {
         let noteToDelete = req.params;
         for (let i = 0; i < db.length; i++) { 
             if (db[i].title === noteToDelete.title) {
