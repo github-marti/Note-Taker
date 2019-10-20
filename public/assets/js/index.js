@@ -11,17 +11,23 @@ let activeNote = {};
 // A function for saving a note to the db
 const saveNote = function(note) {
     $.post("/api/notes", note, function(data) {
+        // if browser receives a response, clear the text areas and add the note to the list
         if (data) {
+            $noteTitle.val('');
+            $noteText.val('');
             renderNoteList(note);
             console.log("note has been saved!");
+
+        // otherwise show a message that notes can't have the same title
         } else if (!data) {
+            let noteText = $noteText.val();
             $noteText.val("You can't save two notes with the same title!")
             $noteText.prop("readonly", true);
             setTimeout(function() {
-                $noteText.val('');
+                $noteText.val(noteText);
                 $noteText.prop("readonly", false);
             }, 1500);
-            console.log("check the code, note hasn't been saved.");
+            console.log("note was not saved");
         }
       });
 };
@@ -36,7 +42,7 @@ const deleteNote = function(title) {
                   console.log(`note with the title ${data} has been deleted!!`);
                 } else if (!data) {
                   console.log("check the code, note hasn't been deleted.");
-                }
+                };
               }
             });
 };
@@ -56,9 +62,6 @@ const handleNoteSave = function() {
         title: $noteTitle.val(), 
         text: $noteText.val()
     };
-    
-    $noteTitle.val('');
-    $noteText.val('');
 
     saveNote(activeNote);
 
@@ -66,8 +69,7 @@ const handleNoteSave = function() {
 };
 
 // Delete the clicked note
-const handleNoteDelete = function(event) {
-    event.preventDefault();
+const handleNoteDelete = function() {
     let title = $(this).parent().text();
     $(this).parent().remove();
     deleteNote(title);
@@ -119,14 +121,10 @@ const renderNoteList = function(note) {
 // Gets notes from the db and renders them to the sidebar
 const getAndRenderNotes = function() {
     $.get('/api/notes', function(data) {
-        const noteObject = JSON.parse(data);
-        noteObject.map(el => {
-            renderNoteList(el);
-        })
+        let notes = JSON.parse(data);
+        notes.map(note => renderNoteList(note));
     });
 };
-
-getAndRenderNotes();
 
 $saveNoteBtn.on("click", handleNoteSave);
 $noteList.on("click", ".list-group-item", handleNoteView);
@@ -134,4 +132,6 @@ $newNoteBtn.on("click", handleNewNoteView);
 $noteList.on("click", ".fa-trash-alt", handleNoteDelete);
 $noteTitle.on("keyup", handleRenderSaveBtn);
 $noteText.on("keyup", handleRenderSaveBtn);
+
+getAndRenderNotes();
 
