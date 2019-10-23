@@ -13,30 +13,20 @@ const saveNote = function(note) {
     $.post("/api/notes", note, function(data) {
         // if browser receives a response, clear the text areas and add the note to the list
         if (data) {
-            $noteTitle.val('');
-            $noteText.val('');
-            renderNoteList(note);
+            activeNote.guid = data;
+            renderNoteList(activeNote);
             console.log("note has been saved!");
-
-        // otherwise show a message that notes can't have the same title
-        } else if (!data) {
-            let noteText = $noteText.val();
-            $noteText.val("You can't save two notes with the same title!")
-            $noteText.prop("readonly", true);
-            setTimeout(function() {
-                $noteText.val(noteText);
-                $noteText.prop("readonly", false);
-            }, 1500);
+        } else {
             console.log("note was not saved");
         }
       });
 };
 
 // A function for deleting a note from the db
-const deleteNote = function(title) {
-    $.ajax({url: `/delete/${title}`, 
+const deleteNote = function(id) {
+    $.ajax({url: `/note/${id}`, 
             type: 'DELETE',
-            data: title,
+            data: id,
             success: function(data) {
                 if (data) {
                   console.log(`note with the title ${data} has been deleted!!`);
@@ -51,48 +41,46 @@ const deleteNote = function(title) {
 // If there is an activeNote, display it, otherwise render empty inputs
 const renderActiveNote = function() {
     if (activeNote) {
-        $noteTitle.val(activeNote.title);
-        $noteText.val(activeNote.text);
+        $noteTitle.val(activeNote.note_title);
+        $noteText.val(activeNote.note_text);
     }
 };
 
 // Get the note data from the inputs, save it to the db and update the view
 const handleNoteSave = function() {
+
     activeNote = { 
-        title: $noteTitle.val(), 
-        text: $noteText.val()
+        note_title: $noteTitle.val(), 
+        note_text: $noteText.val()
     };
 
     saveNote(activeNote);
+
+    $noteTitle.val('');
+    $noteText.val('');
 
     $('.fa-save').attr('style', 'display:none');
 };
 
 // Delete the clicked note
 const handleNoteDelete = function() {
-    let title = $(this).parent().text();
+    let id = $(this).parent().attr('data-index');
     $(this).parent().remove();
-    deleteNote(title);
+    deleteNote(id);
 };
 
 // Sets the activeNote and displays it
 const handleNoteView = function() {
-    let thisNote = $(this).text();
-    $.get('/api/notes', function(data) {
-        let notes = JSON.parse(data);
-        for (el of notes) {
-            if (el.title === thisNote) {
-                activeNote.title = el.title;
-                activeNote.text = el.text;
-                renderActiveNote();
-            };
-        };
+    let id = $(this).attr("data-index");
+    $.get(`/note/${id}`, function(note) {
+        activeNote.note_title = note.note_title;
+        activeNote.note_text = note.note_text;
+        renderActiveNote();
     });
 };
 
 // Sets the activeNote to and empty object and allows the user to enter a new note
 const handleNewNoteView = function() {
-    console.log('new note ready');
     activeNote = {};
     renderActiveNote();
 };
@@ -113,7 +101,8 @@ const renderNoteList = function(note) {
   let listItem = $('<div>').addClass('list-group-item');
   let deleteIcon = $('<i>').addClass('fas fa-trash-alt float-right delete-btn');
 
-  listItem.text(note.title);
+  listItem.text(note.note_title);
+  listItem.attr('data-index', note.guid);
   listItem.append(deleteIcon);
   $('.list-container').prepend(listItem);
 };
@@ -121,8 +110,7 @@ const renderNoteList = function(note) {
 // Gets notes from the db and renders them to the sidebar
 const getAndRenderNotes = function() {
     $.get('/api/notes', function(data) {
-        let notes = JSON.parse(data);
-        notes.map(note => renderNoteList(note));
+        data.map(note => renderNoteList(note));
     });
 };
 
