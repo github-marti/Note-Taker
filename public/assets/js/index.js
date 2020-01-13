@@ -15,7 +15,6 @@ const saveNote = function(note) {
         if (data) {
             activeNote.guid = data;
             renderNoteList(activeNote);
-            console.log("note has been saved!");
         } else {
             console.log("note was not saved");
         }
