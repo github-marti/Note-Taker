@@ -20,7 +20,7 @@ module.exports = function(app) {
             });
         });
 
-    // handles delete reqsuests
+    // handles requests to get or delete a specific note
     app.route("/note/:id")
         .get(function(req, res) {
             noteTaker.getNoteById(req.params.id, function(err, data) {
