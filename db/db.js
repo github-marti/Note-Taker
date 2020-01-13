@@ -2,8 +2,8 @@
 
 const mysql = require('mysql');
 
-//local mysql db connection
-let connection 
+// local mysql db connection
+let connection;
 
 if (process.env.JAWSDB_URL) {
     connection = mysql.createConnection(process.env.JAWSDB_URL);
@@ -13,7 +13,7 @@ if (process.env.JAWSDB_URL) {
         user     : 'root',
         password : 'asdfasdf',
         database : 'notes_DB'
-});
+    });
 };
 
 connection.connect(function(err) {
