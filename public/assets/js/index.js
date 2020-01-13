@@ -94,7 +94,7 @@ const handleRenderSaveBtn = function() {
     };
 };
 
-// Render's the list of note titles
+// Renders the list of note titles
 const renderNoteList = function(note) {
 
   let listItem = $('<div>').addClass('list-group-item');
@@ -113,6 +113,7 @@ const getAndRenderNotes = function() {
     });
 };
 
+// event listeners for button clicks and typing into input boxes
 $saveNoteBtn.on("click", handleNoteSave);
 $noteList.on("click", ".list-group-item", handleNoteView);
 $newNoteBtn.on("click", handleNewNoteView);
